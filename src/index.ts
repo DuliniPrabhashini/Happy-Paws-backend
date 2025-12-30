@@ -3,10 +3,11 @@ import dotenv from "dotenv"
 import cors from "cors"
 import authRouter from "./routes/auth";
 import mongoose from "mongoose";
-import homeRouter from "./routes/home";
 import diseaseRouter from "./routes/disease";
 import chatBotRoute from "./routes/chatBot";
 import profileRouter from "./routes/profile";
+import petRouter from "./routes/pet";
+import petDetailsRouter from "./routes/petDetails";
 
 dotenv.config();
 
@@ -25,13 +26,15 @@ app.use(
 
 app.use("/api/happy-paws/auth", authRouter)
 
-app.use("/api/happy-paws/home", homeRouter)
+app.use("/api/happy-paws/pet", petRouter)
 
 app.use("/api/happy-paws/diseases", diseaseRouter)
 
 app.use("/api/happy-paws/chat", chatBotRoute)
 
 app.use("/api/happy-paws/profile", profileRouter)
+
+app.use("/api/happy-paws/pet-details", petDetailsRouter)
 
 
 

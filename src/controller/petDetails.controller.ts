@@ -27,7 +27,6 @@ export const addPetDetail = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// Delete pet detail
 export const deletePetDetail = async (req: AuthRequest, res: Response) => {
   try {
     const detailId = req.query.detailId;
@@ -37,7 +36,6 @@ export const deletePetDetail = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "Pet detail not found" });
     }
 
-    // check ownership
     const pet = await Pet.findById(detail.petId);
     if (!pet) return res.status(404).json({ message: "Pet not found" });
 
@@ -54,7 +52,6 @@ export const deletePetDetail = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// Get all details for a specific pet
 export const getPetDetails = async (req: AuthRequest, res: Response) => {
   try {
     const petId = req.params.petId;
@@ -75,7 +72,6 @@ export const getPetDetails = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// Get all details for logged-in user (optional)
 export const getMyPetDetails = async (req: AuthRequest, res: Response) => {
   try {
     const ownerId = req.user.sub;
@@ -90,4 +86,38 @@ export const getMyPetDetails = async (req: AuthRequest, res: Response) => {
   } catch (err) {
     return res.status(500).json({ message: "Internal server error" });
   }
+}
+
+export const getMyPetDetailsReminder = async (req: AuthRequest, res: Response) => {
+  try {
+    const ownerId = req.user.sub
+
+    if (!ownerId) {
+      return res.status(400).json({ message: "Owner ID is required" });
+    }
+
+    const pets = await Pet.find({ owner: ownerId });
+
+    if (!pets || pets.length === 0) {
+      return res.status(404).json({ message: "No pets found for this owner" });
+    }
+
+    const petIds = pets.map((pet) => pet._id);
+
+    const petDetails = await PetDetail.find({ petId: { $in: petIds } })
+      .populate("petId", "name type imageUrl") 
+      .sort({ date: 1 });
+
+    return res.status(200).json({
+      success: true,
+      petsCount: pets.length,
+      remindersCount: petDetails.length,
+      reminders: petDetails
+    });
+
+  } catch (err) {
+    console.error("Error loading reminders:", err);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 };
+

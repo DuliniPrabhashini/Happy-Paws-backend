@@ -2,21 +2,18 @@ import cron from "node-cron";
 import { PetDetail } from "../models/petDetails.model";
 import { sendEmail } from "./emails";
 
-/**
- * Schedule daily reminders at 00:00
- */
+
 export const scheduleDailyReminders = () => {
   cron.schedule("0 0 * * *", async () => {
     console.log("Running daily email reminders...");
 
     try {
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // Start of today
+      today.setHours(0, 0, 0, 0); 
 
       const tomorrow = new Date(today);
-      tomorrow.setDate(today.getDate() + 1); // For querying the exact day
+      tomorrow.setDate(today.getDate() + 1); 
 
-      // Find all PetDetails where date is today
       const reminders = await PetDetail.find({
         date: {
           $gte: today,
@@ -24,14 +21,14 @@ export const scheduleDailyReminders = () => {
         },
       }).populate({
         path: "petId",
-        populate: { path: "owner" }, // populate owner info from Pet → User
+        populate: { path: "owner" }, 
       });
 
       for (const reminder of reminders) {
-        const pet = reminder.petId as any; // populated pet
-        if (!pet?.owner) continue; // skip if owner not found
+        const pet = reminder.petId as any; 
+        if (!pet?.owner) continue; 
 
-        const owner = pet.owner as any; // populated user
+        const owner = pet.owner as any;
         const email = owner.email;
         const petName = pet.name;
 

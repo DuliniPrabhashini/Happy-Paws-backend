@@ -56,9 +56,9 @@ export const updateDisease = async (req: AuthRequest, res: Response) => {
     const ownerId = req.user.sub || req.user._id;
     const image = req.file?.buffer;
 
-    console.log(ownerId)
-    console.log("update diseas is working")
-    console.log(title, description, symptoms, species )
+    console.log(ownerId);
+    console.log("update diseas is working");
+    console.log(title, description, symptoms, species);
 
     if (!title || !description || !symptoms || !species || !ownerId) {
       return res.status(400).json({ message: "Missing required fields..!" });
@@ -99,7 +99,7 @@ export const updateDisease = async (req: AuthRequest, res: Response) => {
       imageUrl = upload.secure_url;
     }
 
-    console.log(imageUrl)
+    console.log(imageUrl);
 
     const updateDisease = await Disease.findByIdAndUpdate(
       diseaseId,
@@ -113,12 +113,10 @@ export const updateDisease = async (req: AuthRequest, res: Response) => {
       { new: true }
     );
 
-    return res
-      .status(200)
-      .json({
-        message: "Disease Updated successfully",
-        disease: updateDisease,
-      });
+    return res.status(200).json({
+      message: "Disease Updated successfully",
+      disease: updateDisease,
+    });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Internal server Error" });
@@ -155,7 +153,7 @@ export const deleteDisease = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const getAllDiseases = async (req: Request, res: Response) => {
+export const getAllDiseases = async (req: AuthRequest, res: Response) => {
   try {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
@@ -165,7 +163,6 @@ export const getAllDiseases = async (req: Request, res: Response) => {
     const skip = (page - 1) * limit;
 
     let filters: any = {};
-
     if (search) {
       filters.$or = [
         { title: { $regex: search, $options: "i" } },
@@ -174,9 +171,11 @@ export const getAllDiseases = async (req: Request, res: Response) => {
       ];
     }
 
+
     if (species) {
       filters.species = species;
     }
+    const totalUserPosts = await Disease.countDocuments({ createdBy: req.user.sub });
 
     const total = await Disease.countDocuments(filters);
 
@@ -192,6 +191,7 @@ export const getAllDiseases = async (req: Request, res: Response) => {
       totalPages: Math.ceil(total / limit),
       totalResults: total,
       diseases,
+      totalUserPosts
     });
   } catch (err) {
     return res.status(500).json({ message: "Internal server Error" });
@@ -227,6 +227,7 @@ export const getAllDiseasesByUser = async (req: AuthRequest, res: Response) => {
 
     const total = await Disease.countDocuments(filters);
 
+
     const diseases = await Disease.find(filters)
       .populate("createdBy", "username email")
       .sort({ createdAt: -1 })
@@ -238,7 +239,7 @@ export const getAllDiseasesByUser = async (req: AuthRequest, res: Response) => {
       currentPage: page,
       totalPages: Math.ceil(total / limit),
       totalResults: total,
-      diseases,
+      diseases
     });
   } catch (err) {
     return res.status(500).json({ message: "Internal server Error" });

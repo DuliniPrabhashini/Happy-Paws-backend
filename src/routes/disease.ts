@@ -9,7 +9,7 @@ diseaseRouter.post("/addDisease",authenticate,upload.single("image"),postDisease
 
 diseaseRouter.post("/updateDisease",authenticate,upload.single("image"),updateDisease)
 
-diseaseRouter.delete("/deleteDisease",authenticate ,deleteDisease)
+diseaseRouter.delete("/deleteDisease/:diseaseId",authenticate ,deleteDisease)
 
 diseaseRouter.get("/getAllDisease",authenticate ,getAllDiseases)
 

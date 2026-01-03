@@ -35,13 +35,12 @@ const diseaseSchema = new Schema<IDisease>(
       enum: [
         "Dog",
         "Cat",
-        "Cow",
-        "Goat",
-        "Sheep",
+        "Fish",
+        "Hamster",
         "Horse",
         "Rabbit",
         "Bird",
-        "Other",
+        "All Pets",
       ],
     },
 

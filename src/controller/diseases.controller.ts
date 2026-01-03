@@ -125,7 +125,8 @@ export const updateDisease = async (req: AuthRequest, res: Response) => {
 
 export const deleteDisease = async (req: AuthRequest, res: Response) => {
   try {
-    const diseaseId = req.query.diseaseId;
+    const { diseaseId } = req.params;
+
     const disease = await Disease.findById(diseaseId);
 
     if (!disease) {

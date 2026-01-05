@@ -20,7 +20,7 @@ app.use(express.json())
 app.use(
     cors({
       // origin: ["http://localhost:5173","http://localhost:8080"],
-      origin: ["https://happy-paws-frontend.vercel.app"],
+      origin: ["https://happy-paws-frontend.vercel.app/api/happy-paws"],
         methods: ["GET", "POST", "PUT", "DELETE"],
     })
 )

@@ -2,37 +2,63 @@ import { Request, Response } from "express"
 import axios from "axios"
 
 export const chatBot = async (req: Request, resp: Response) => {
-    const { text, maxToken } = req.body
+  try {
+    const { data } = req.body;
 
-   const aiResponse = await axios.post(
-     "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
-     {
-       contents: [
-         {
-           parts: [{ text }]
-         }
-       ],
-       generationConfig: {
-         maxOutputTokens: maxToken || 150
-       }
-     },
-     {
-       headers: {
-         "Content-Type": "application/json",
-         "X-goog-api-key": "AIzaSyBchMFLGFCOPIZSTg72OMwaXdzBAbOk2Ps"
-       }
-     }
-   )
+    const prompt = `
+                    answer the following question if its only about related to animals or else answer not related to this question.
 
-   const genratedContent =
-     aiResponse.data?.candidates?.[0]?.content?.[0]?.text ||
-     aiResponse.data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-     "No data"
+                    The answer should be professional and should complete one.
+                    It should sound like a professional and complete related what user asked. use only 800 maximum words and complete the answer
 
-   console.log(resp)
+                    Do NOT add explanations, headings, or commentary.
+                    Return ONLY the answer.
+                    Original question:
+                    ${data}
+                    `
 
-   resp.status(200).json({
-     data: genratedContent
-   })
+    const maxToken = 1000
+
+    const aiResponse = await axios.post(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+      {
+        contents: [
+          {
+            parts: [
+              {
+                text: prompt,
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          maxOutputTokens: maxToken,
+        },
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-goog-api-key": "AIzaSyCsm-2oluWwWcBi6O2bu3cGBr_yPDpS3ck",
+        },
+      }
+    );
+
+    const genratedContent =
+      aiResponse.data?.candidates?.[0]?.content?.[0]?.text ||
+      aiResponse.data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "No data";
+
+    console.log(genratedContent);
+
+    resp.status(200).json({
+      message: "success",
+      data: genratedContent,
+    });
+  } catch (error) {
+    console.error(error);
+    resp.status(500).json({
+      message: "Internal server error",
+    });
+  }
 
 }

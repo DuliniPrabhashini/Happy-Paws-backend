@@ -105,9 +105,7 @@ export const login = async (request: Request, response: Response) => {
   }
 }
 
-export const logout = async (request: Request, response: Response) => { 
 
-}
 
 export const getMyProfile = async (request: AuthRequest, response: Response) => {
     if (!request.user) {
@@ -144,30 +142,39 @@ export const forgetPassword = async (request: Request, response: Response) => {
     response.status(500).json({message: "Internal server error!"})
   }
 }
-export const refreshToken = async(request: Request, response: Response) => {
+export const refreshToken = async (req: Request, res: Response) => {
   try {
-    const { token } = request.body
-    if (!token) {
-      return response.status(400).json({ message: "Token required!" })
+    console.log("working token")
+
+    const { refreshToken  } = req.body;
+
+    if (!refreshToken ) {
+      return res.status(400).json({
+        message: "Refresh token is missing or invalid",
+      });
     }
 
-    const payload = jwt.verify(token, JWT_ACCESS_SECRET)
+    const payload = jwt.verify(refreshToken , process.env.REFRESH_SECRET as string ) as jwt.JwtPayload
 
-    const user = await User.findById(payload.sub)
+    const user = await User.findById(payload.sub);
 
     if (!user) {
-      return response.status(403).json({message: "User not found or no user logged in !"})
+      return res.status(403).json({
+        message: "User NOT FOUND or No User logged in",
+      });
     }
 
-    const accessToken = signAccessToken(user)
-    response.status(200).json({ accessToken })
-    
-  } catch (error) {
-    response.status(403).json({
-      message: "Invalid or expired token!"
-    })
+    const accessToken = signAccessToken(user);
+    const refreshToken2 = signRefreshToken(user);
+
+    res.status(200).json({
+      accessToken,
+      refreshToken:refreshToken2
+    });
+  } catch (err) {
+    res.status(401).json({ message: "Refresh token expired"})
   }
-}
+};
 
 
 

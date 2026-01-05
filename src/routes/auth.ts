@@ -21,7 +21,9 @@ authRouter.get("/getProfile",authenticate, getMyProfile)
 
 authRouter.post("/forget_password", forgetPassword)
 
-authRouter.post("/refresh", refreshToken)
+authRouter.post("/refreshToken", refreshToken)
+
+authRouter.post("/reset_password",forgetPassword)//work to done
 
 export default authRouter
 

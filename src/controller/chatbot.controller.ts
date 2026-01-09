@@ -38,7 +38,7 @@ export const chatBot = async (req: Request, resp: Response) => {
       {
         headers: {
           "Content-Type": "application/json",
-          "X-goog-api-key": "AIzaSyCsm-2oluWwWcBi6O2bu3cGBr_yPDpS3ck",
+          "X-goog-api-key": "AIzaSyBrdW1RnJjNmqDE3AQdvgM_UkvpNIwI9R8",
         },
       }
     );
